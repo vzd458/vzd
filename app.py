@@ -27,7 +27,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 GROUP_CHAT_ID = int(os.getenv("GROUP_CHAT_ID") or 0)
 
-START_IMAGE_URL = "https://files.catbox.moe/3jvcid.jpg"
+START_IMAGE_URL = "https://files.catbox.moe/fr10m2.mp4"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn.close()
 
 # ================= TEXTOS =================
-MAIN_TEXT = """⚠️Bem-vindo à irmandade mais foda do Brasil.🔞
+MAIN_TEXT = """Vazados Br ofc.🔞
 
 🔱Você está quase lá 💥
 👇🏼Escolha Um Plano👇🏼
@@ -74,8 +74,8 @@ STOP_COUNTER = 137500
 counter_value = START_COUNTER
 
 PLANS = {
-    "mensal": {"label": "💳 Mensal — R$15", "amount": 15.00},
-    "vitalicio": {"label": "🔥 Vitalício — R$19", "amount": 19.00},
+    "mensal": {"label": "💳 Mensal — R$13", "amount": 13.00},
+    "vitalicio": {"label": "🔥 Vitalício — R$16", "amount": 16.00},
 }
 
 PROMO_CODES = {"THG100", "FLP100"}
