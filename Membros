@@ -103,7 +103,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     counter_msg = await update.message.reply_text(
-        f"🔥🔞 *Membros 👥⬆:* {counter_value:,}".replace(",", "."),
+        f"🔥🔞 *Membros Atuais 👥⬆:* {counter_value:,}".replace(",", "."),
         parse_mode="Markdown"
     )
 
@@ -121,7 +121,7 @@ async def counter_task(context, chat_id, message_id):
             await context.bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=f"🔥🔞 *Membros 👥⬆:* {counter_value:,}".replace(",", "."),
+                text=f"🔥🔞 *Membros Atuais 👥⬆:* {counter_value:,}".replace(",", "."),
                 parse_mode="Markdown"
             )
         except:
