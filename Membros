@@ -63,10 +63,13 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn.close()
 
 # ================= TEXTOS =================
-MAIN_TEXT = """Vazados Br ofc.🔞
+MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷🔞
+   
+              ⚠️ÚNICO!
+✅Grupo Com + de 36 mil vídeos de vazados Reais Brasileiros.
 
-🔱Você está quase lá 💥
-👇🏼Escolha Um Plano👇🏼
+🔱Você Está Quase lá 💥
+👇🏼Escolha Um Plano👇
 """
 
 START_COUNTER = 135920
