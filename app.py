@@ -27,7 +27,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 GROUP_CHAT_ID = int(os.getenv("GROUP_CHAT_ID") or 0)
 
-START_IMAGE_URL = "https://files.catbox.moe/fr10m2.mp4"
+START_VIDEO_URL = "https://files.catbox.moe/fr10m2.mp4"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -95,7 +95,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("🔄 Já paguei", callback_data="check_payment")]
     ]
 
-    await update.message.reply_photo(photo=START_IMAGE_URL)
+    await update.message.reply_video(video=START_VIDEO_URL)
 
     await update.message.reply_text(
         MAIN_TEXT,
