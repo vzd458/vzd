@@ -63,13 +63,53 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn.close()
 
 # ================= TEXTOS =================
-MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷🔞
-   
-              ⚠️ÚNICO!
-✅Grupo Com + de 36 mil vídeos de vazados Reais Brasileiros.
+MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷
 
-🔱Você Está Quase lá 💥
-👇🏼Escolha Um Plano👇
+🔥 Todo o conteúdo reunido em um único lugar, sem limites!
+
+🔐 Ao entrar, você libera: ⤵️
+
+🔞 𝙎𝙚𝙥𝙖𝙧𝙖𝙙𝙤𝙨 𝙥𝙤𝙧 𝙘𝙖𝙩𝙚𝙜𝙤𝙧𝙞𝙖:
+🗂 𝙊𝙧𝙜𝙖𝙣𝙞𝙯𝙖𝙘̧𝙖̃𝙤 𝙙𝙚 𝙖-𝙯!
+🔥amadores 
+🔥desenhos animados +18
+🔥lésbicas 
+🔥Hentai 
+🔥novinhas com animais
+🔥Anal
+🔥Anime
+🔥Trans
+🔥Cosplay
+🔥Milf
+🔥Boquete babado
+🔥Verdade ou desafio
+🔥 МILFѕСâmеrаѕ 
+🔥IΝс3ѕtо Ѕесrе3t0rеаl
+🔥 Novinhas
+🔥 Cornos 
+🔥 Virgens
+🔥 Lésbicas
+🔥Gordinhas
+🔥 Vazadas
+🔥 Flagras e Câmeras Escondidas
+🔥 Orgias & GangBang
+🔥 Coroas
+🔥 Famosas
+🔥tufos filmes animados
+🔥 CLOSE FRIENDS
+🔥 MAIS GOSTOSAS DA NET
+🔥 BRAZZERS
+🔥 XVÍDEOS RED
+🔥 FAMÍLIA SACANA
+🔥 é muito mais
+🔥 Chat ao vivo com novinhas
+
+🚀 Liberado na hora
+🛠️ Suporte 24h
+📦 Atualizações diárias
+🔒 Compra 100% segura
+
+🔞 Escolha seu plano especial abaixo: 👇
 """
 
 START_COUNTER = 135920
