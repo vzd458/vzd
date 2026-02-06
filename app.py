@@ -209,7 +209,7 @@ async def check_payment_status(update, context):
 
     if uid not in user_last_payment:
         await update.callback_query.message.reply_text(
-            "❌ Nenhum pagamento encontrado.",
+            "❌ pagamento ainda não confirmado!",
             parse_mode="Markdown"
         )
         return
