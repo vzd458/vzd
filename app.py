@@ -27,7 +27,7 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 GROUP_CHAT_ID = int(os.getenv("GROUP_CHAT_ID") or 0)
 
-START_VIDEO_URL = "https://files.catbox.moe/fr10m2.mp4"
+START_VIDEO_URL = "https://files.catbox.moe/4abfa3.mp4"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn.close()
 
 # ================= TEXTOS =================
-MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷
+MAIN_TEXT = ""🔥Vazados BR ofc.🇧🇷
 
 🔥 Todo o conteúdo reunido em um único lugar, sem limites!
 
@@ -209,7 +209,7 @@ async def check_payment_status(update, context):
 
     if uid not in user_last_payment:
         await update.callback_query.message.reply_text(
-            "❌ pagamento ainda não confirmado!",
+            "❌ Nenhum pagamento encontrado.",
             parse_mode="Markdown"
         )
         return
