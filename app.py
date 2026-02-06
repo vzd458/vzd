@@ -63,7 +63,7 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn.close()
 
 # ================= TEXTOS =================
-MAIN_TEXT = ""🔥Vazados BR ofc.🇧🇷
+MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷
 
 🔥 Todo o conteúdo reunido em um único lugar, sem limites!
 
