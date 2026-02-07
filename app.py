@@ -363,16 +363,13 @@ async def mp_webhook(request: Request):
     return {"status": "disabled"}
 
 # ================= MAIN =================
-async def main():
-    init_db()
+def main():
+    application = Application.builder().token(TOKEN).build()
 
-    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    # handlers aqui...
 
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.run_polling()
 
-    await application.run_polling()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
