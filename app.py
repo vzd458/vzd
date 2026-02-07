@@ -282,7 +282,7 @@ async def check_payment_status(update, context):
     info = mp.payment().get(payment_id)
     status = info.get("response", {}).get("status")
 
-    if status == "approved":
+if status == "approved":
 
     task = abandoned_tasks.pop(uid, None)
     if task:
