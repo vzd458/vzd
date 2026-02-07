@@ -313,7 +313,7 @@ async def button(update: Update, context):
         awaiting_promo[q.from_user.id] = True
         await q.message.reply_text("🎟️ Envie o código:")
 
-    elif q.data == "preview":
+elif q.data == "preview":
     await send_previews(update, context)
 
 # ================= PROMO =================
