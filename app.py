@@ -293,10 +293,11 @@ async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYP
             member_limit=1
         )
 
-        await update.callback_query.message.reply_text(
-            f"✔ Pagamento aprovado!\n{invite.invite_link}",
-            parse_mode="Markdown"
-        )
+await update.callback_query.message.reply_text(
+    f"✔ Pagamento aprovado!\n<a href='{invite.invite_link}'>Entrar no grupo</a>",
+    parse_mode="HTML",
+    disable_web_page_preview=True
+)
 
 
 # ================= BUTTON =================
