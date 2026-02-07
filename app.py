@@ -268,12 +268,12 @@ async def process_payment(update, context, plan_key):
         await msg.reply_photo(img)
 
 # ================= CHECK =================
-async def check_payment_status(update, context):
+async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
 
     if uid not in user_last_payment:
         await update.callback_query.message.reply_text(
-            "❌ pagamento ainda não confirmado!",
+            "✖ pagamento ainda não confirmado!",
             parse_mode="Markdown"
         )
         return
@@ -282,21 +282,22 @@ async def check_payment_status(update, context):
     info = mp.payment().get(payment_id)
     status = info.get("response", {}).get("status")
 
-if status == "approved":
+    if status == "approved":
 
-    task = abandoned_tasks.pop(uid, None)
-    if task:
-        task.cancel()
+        task = abandoned_tasks.pop(uid, None)
+        if task:
+            task.cancel()
 
-    invite = await bot_app.bot.create_chat_invite_link(
-        GROUP_CHAT_ID,
-        member_limit=1
-    )
+        invite = await context.bot.create_chat_invite_link(
+            chat_id=GROUP_CHAT_ID,
+            member_limit=1
+        )
 
-    await update.callback_query.message.reply_text(
-        f"✅ *Pagamento aprovado!*\n{invite.invite_link}",
-        parse_mode="Markdown"
-    )
+        await update.callback_query.message.reply_text(
+            f"✔ Pagamento aprovado!\n{invite.invite_link}",
+            parse_mode="Markdown"
+        )
+
 
 # ================= BUTTON =================
 async def button(update: Update, context):
