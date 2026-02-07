@@ -273,8 +273,7 @@ async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if uid not in user_last_payment:
         await update.callback_query.message.reply_text(
-            "✖ pagamento ainda não confirmado!",
-            parse_mode="Markdown"
+            "✖ pagamento ainda não confirmado!"
         )
         return
 
@@ -293,12 +292,15 @@ async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYP
             member_limit=1
         )
 
-await update.callback_query.message.reply_text(
-    f"✔ Pagamento aprovado!\n<a href='{invite.invite_link}'>Entrar no grupo</a>",
-    parse_mode="HTML",
-    disable_web_page_preview=True
-)
-
+        await update.callback_query.message.reply_text(
+            f"✔ Pagamento aprovado!\n<a href='{invite.invite_link}'>Entrar no grupo</a>",
+            parse_mode="HTML",
+            disable_web_page_preview=True
+        )
+    else:
+        await update.callback_query.message.reply_text(
+            "⏳ Pagamento ainda em processamento..."
+        )
 
 # ================= BUTTON =================
 async def button(update: Update, context):
@@ -315,8 +317,8 @@ async def button(update: Update, context):
         awaiting_promo[q.from_user.id] = True
         await q.message.reply_text("🎟️ Envie o código:")
 
-    elif q.data == "preview":
-        await send_previews(update, context)
+    elif q.data == "check_payment":
+        await check_payment_status(update, context)
 
 # ================= PROMO =================
 async def handle_message(update: Update, context):
