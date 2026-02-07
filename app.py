@@ -16,6 +16,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+
 from dotenv import load_dotenv
 import mercadopago
 from fastapi import FastAPI, Request
@@ -23,28 +24,26 @@ import uvicorn
 
 # ================= CONFIG =================
 load_dotenv()
+
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 GROUP_CHAT_ID = int(os.getenv("GROUP_CHAT_ID") or 0)
 
-START_VIDEO_URL = "https://files.catbox.moe/fr10m2.mp4"
+START_VIDEO_URL_1 = "https://files.catbox.moe/4abfa3.mp4"
+START_VIDEO_URL_2 = "https://files.catbox.moe/yu3i0y.mp4"
 
-START_VIDEO_URL_1 = "https://link-do-video-1.mp4"
-START_VIDEO_URL_2 = "https://link-do-video-2.mp4"
-START_AUDIO_URL = "https://link-do-audio.mp3"
+PRE_PAYMENT_VIDEO_URL = "https://files.catbox.moe/p3tfer.mp4"
+ABANDON_VIDEO_URL = "https://files.catbox.moe/hotdya.mp4"
 
-PRE_PAYMENT_VIDEO_URL = "https://link-do-video-antes-do-pix.mp4"
-ABANDON_VIDEO_URL = "https://link-do-video-lembrete.mp4"
-
-PREVIEW_VIDEO_1 = "https://link-do-video-previa-1.mp4"
-PREVIEW_VIDEO_2 = "https://link-do-video-previa-2.mp4"
-PREVIEW_VIDEO_3 = "https://link-do-video-previa-3.mp4"
-
+PREVIEW_VIDEO_1 = "https://files.catbox.moe/978wjh.mp4"
+PREVIEW_VIDEO_2 = "https://files.catbox.moe/zqtrmi.mp4"
+PREVIEW_VIDEO_3 = "https://files.catbox.moe/5ynxw8.mp4"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 mp = mercadopago.SDK(MP_ACCESS_TOKEN)
+
 DB_PATH = "payments.db"
 
 # ================= DATABASE =================
@@ -52,14 +51,14 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS payments (
-        payment_id TEXT PRIMARY KEY,
-        user_id TEXT,
-        plan TEXT,
-        amount REAL,
-        status TEXT,
-        created_at INTEGER
-    )
+        CREATE TABLE IF NOT EXISTS payments (
+            payment_id TEXT PRIMARY KEY,
+            user_id TEXT,
+            plan TEXT,
+            amount REAL,
+            status TEXT,
+            created_at INTEGER
+        )
     """)
     conn.commit()
     conn.close()
@@ -68,8 +67,8 @@ def save_payment(payment_id, user_id, plan, amount, status="pending"):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute("""
-    INSERT OR REPLACE INTO payments
-    VALUES (?, ?, ?, ?, ?, ?)
+        INSERT OR REPLACE INTO payments
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (str(payment_id), str(user_id), plan, amount, status, int(time.time())))
     conn.commit()
     conn.close()
@@ -82,23 +81,39 @@ MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷
 🔐 Ao entrar, você libera: ⤵️
 
 🔞 𝙎𝙚𝙥𝙖𝙧𝙖𝙙𝙤𝙨 𝙥𝙤𝙧 𝙘𝙖𝙩𝙚𝙜𝙤𝙧𝙞𝙖:
-🗂 𝙊𝙧𝙜𝙖𝙣𝙞𝙯𝙖𝙘‌𝙖‌𝙤 𝙙𝙚 𝙖-𝙯!
-🔥amadores🔥desenhos animados +18
-🔥lésbicas🔥Hentai 
-🔥novinhas com animais🔥Anal
-🔥Anime🔥Trans
-🔥Cosplay🔥Milf
-🔥Boquete babado🔥Verdade ou desafio
-🔥 МILFѕСâmеrаѕ 🔥IΝс3ѕtо Ѕесrе3t0rеаl
-🔥 Novinhas🔥 Cornos 
-🔥 Virgens🔥 Lésbicas
-🔥Gordinhas🔥 Vazadas
-🔥Câmeras Escondidas🔥 Orgias & GangBang
-🔥 Coroas🔥 Famosas
-🔥tufos filmes animados🔥 CLOSE FRIENDS
-🔥 MAIS GOSTOSAS DA NET🔥 BRAZZERS
-🔥 XVÍDEOS RED🔥 FAMÍLIA SACANA
-🔥 é muito mais🔥 Chat ao vivo com novinhas
+🗂 𝙊𝙧𝙜𝙖𝙣𝙞𝙯𝙖𝙘̧𝙖̃𝙤 𝙙𝙚 𝙖-𝙯!
+🔥amadores 
+🔥desenhos animados +18
+🔥lésbicas 
+🔥Hentai 
+🔥novinhas com animais
+🔥Anal
+🔥Anime
+🔥Trans
+🔥Cosplay
+🔥Milf
+🔥Boquete babado
+🔥Verdade ou desafio
+🔥 МILFѕСâmеrаѕ 
+🔥IΝс3ѕtо Ѕесrе3t0rеаl
+🔥 Novinhas
+🔥 Cornos 
+🔥 Virgens
+🔥 Lésbicas
+🔥Gordinhas
+🔥 Vazadas
+🔥 Flagras e Câmeras Escondidas
+🔥 Orgias & GangBang
+🔥 Coroas
+🔥 Famosas
+🔥tufos filmes animados
+🔥 CLOSE FRIENDS
+🔥 MAIS GOSTOSAS DA NET
+🔥 BRAZZERS
+🔥 XVÍDEOS RED
+🔥 FAMÍLIA SACANA
+🔥 é muito mais
+🔥 Chat ao vivo com novinhas
 
 🚀 Liberado na hora
 🛠️ Suporte 24h
@@ -118,48 +133,65 @@ PLANS = {
 }
 
 PROMO_CODES = {"THG100", "KLM100"}
+
 awaiting_promo = {}
 user_last_payment = {}
-bot_app = None
-
 abandoned_tasks = {}
 
 PREVIEW_BUTTON = InlineKeyboardButton("👀 Prévias", callback_data="preview")
 
-async def send_previews(update, context):
+# ================= PREVIEWS =================
+async def send_previews(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.callback_query.message.chat_id
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔥 Quero entrar", callback_data="restart")]
     ])
 
-    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_1, reply_markup=keyboard)
-    await asyncio.sleep(1)
+    previas = [
+        {
+            "video": PREVIEW_VIDEO_1,
+            "texto": "🔥 *Prévia 1*\n\nVeja um pouco do conteúdo exclusivo que te espera."
+        },
+        {
+            "video": PREVIEW_VIDEO_2,
+            "texto": "🔥 *Prévia 2*\n\nAtualizações diárias e acesso imediato."
+        },
+        {
+            "video": PREVIEW_VIDEO_3,
+            "texto": "🔥 *Prévia 3*\n\nÚltima chance de entrar hoje 👇"
+        },
+    ]
 
-    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_2, reply_markup=keyboard)
-    await asyncio.sleep(1)
+    for previa in previas:
+        # Envia o vídeo
+        await context.bot.send_video(
+            chat_id=chat_id,
+            video=previa["video"]
+        )
 
-    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_3, reply_markup=keyboard)
+        # Envia a mensagem com botão logo abaixo
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=previa["texto"],
+            parse_mode="Markdown",
+            reply_markup=keyboard
+        )
 
+        await asyncio.sleep(1)
 
-async def abandoned_flow(context, user_id, chat_id):
-    await asyncio.sleep(180)  # 3 minutos
+# ================= ABANDONO =================
+async def abandoned_flow(context, chat_id):
+    await asyncio.sleep(180)
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔥 Quero entrar", callback_data="restart")]
     ])
 
-    await context.bot.send_video(
-        chat_id=chat_id,
-        video=ABANDON_VIDEO_URL
-    )
-
+    await context.bot.send_video(chat_id, ABANDON_VIDEO_URL)
     await context.bot.send_message(
-        chat_id=chat_id,
-        text=(
-            "⏰ *Ei! Ainda dá tempo de entrar.*\n\n"
-            "Clique no botão abaixo para continuar 👇"
-        ),
+        chat_id,
+        "⏰ *Ei! Ainda dá tempo de entrar.*\n\nClique abaixo 👇",
         parse_mode="Markdown",
         reply_markup=keyboard
     )
@@ -171,32 +203,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     uid = update.effective_user.id
 
-    # cancela timer antigo
     task = abandoned_tasks.pop(uid, None)
     if task:
         task.cancel()
 
-    # inicia novo timer de 3 minutos
-    task = asyncio.create_task(
-        abandoned_flow(context, uid, update.effective_chat.id)
+    abandoned_tasks[uid] = asyncio.create_task(
+        abandoned_flow(context, update.effective_chat.id)
     )
-    abandoned_tasks[uid] = task
 
-    keyboard = [
+    keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(PLANS["mensal"]["label"], callback_data="buy_mensal")],
         [InlineKeyboardButton(PLANS["vitalicio"]["label"], callback_data="buy_vitalicio")],
         [InlineKeyboardButton("🎟️ Código", callback_data="promo")],
-        [PREVIEW_BUTTON]
-        
-    ]
-    await update.message.reply_video(video=START_VIDEO_URL_1)
-    await update.message.reply_video(video=START_VIDEO_URL_2)
-    await update.message.reply_audio(audio=START_AUDIO_URL)
+        [PREVIEW_BUTTON],
+    ])
 
-    await update.message.reply_text(
-        MAIN_TEXT,
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    await update.message.reply_video(START_VIDEO_URL_1)
+    await update.message.reply_video(START_VIDEO_URL_2)
+    await update.message.reply_audio(START_AUDIO_URL)
+
+    await update.message.reply_text(MAIN_TEXT, reply_markup=keyboard)
 
     counter_msg = await update.message.reply_text(
         f"🔥🔞 *Membros Atuais 👥⬆:* {counter_value:,}".replace(",", "."),
@@ -229,13 +255,9 @@ async def process_payment(update, context, plan_key):
     user_id = update.effective_user.id
     msg = update.callback_query.message
 
-    # 📹 Envia vídeo antes do PIX
-    await msg.reply_video(video=PRE_PAYMENT_VIDEO_URL)
-
-    # ⏳ Pequeno delay (opcional, mas recomendado)
+    await msg.reply_video(PRE_PAYMENT_VIDEO_URL)
     await asyncio.sleep(1)
 
-    # 💰 Agora gera o pagamento
     data = {
         "transaction_amount": plan["amount"],
         "description": f"{plan_key.upper()} user:{user_id}",
@@ -253,28 +275,26 @@ async def process_payment(update, context, plan_key):
     save_payment(payment_id, user_id, plan_key, plan["amount"])
     user_last_payment[user_id] = payment_id
 
-    keyboard = [
+    keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔄 Já paguei", callback_data="check_payment")]
-    ]
+    ])
 
     await msg.reply_text(
         f"💰 *{plan['label']}*\n\n🪙 *PIX Copia e Cola:*\n`{qr}`",
         parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+        reply_markup=keyboard
     )
 
     if qr_b64:
         img = io.BytesIO(base64.b64decode(qr_b64))
         await msg.reply_photo(img)
 
-# ================= CHECK =================
+# ================= CHECK PAGAMENTO =================
 async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
 
     if uid not in user_last_payment:
-        await update.callback_query.message.reply_text(
-            "✖ pagamento ainda não confirmado!"
-        )
+        await update.callback_query.message.reply_text("✖ pagamento ainda não confirmado!")
         return
 
     payment_id = user_last_payment[uid]
@@ -282,7 +302,6 @@ async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYP
     status = info.get("response", {}).get("status")
 
     if status == "approved":
-
         task = abandoned_tasks.pop(uid, None)
         if task:
             task.cancel()
@@ -298,12 +317,10 @@ async def check_payment_status(update: Update, context: ContextTypes.DEFAULT_TYP
             disable_web_page_preview=True
         )
     else:
-        await update.callback_query.message.reply_text(
-            "⏳ Pagamento ainda em processamento..."
-        )
+        await update.callback_query.message.reply_text("⏳ Pagamento ainda em processamento...")
 
 # ================= BUTTON =================
-async def button(update: Update, context):
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
 
@@ -313,15 +330,18 @@ async def button(update: Update, context):
     elif q.data == "buy_vitalicio":
         await process_payment(update, context, "vitalicio")
 
+    elif q.data == "check_payment":
+        await check_payment_status(update, context)
+
     elif q.data == "promo":
         awaiting_promo[q.from_user.id] = True
         await q.message.reply_text("🎟️ Envie o código:")
 
-    elif q.data == "check_payment":
-        await check_payment_status(update, context)
+    elif q.data == "preview":
+        await send_previews(update, context)
 
 # ================= PROMO =================
-async def handle_message(update: Update, context):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     uid = update.effective_user.id
     if not awaiting_promo.get(uid):
         return
@@ -343,20 +363,16 @@ async def mp_webhook(request: Request):
     return {"status": "disabled"}
 
 # ================= MAIN =================
-def main():
+async def main():
     init_db()
 
-    global bot_app
-    bot_app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    bot_app.add_handler(CommandHandler("start", start))
-    bot_app.add_handler(CallbackQueryHandler(button))
-    bot_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(bot_app.run_polling())
-
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 10000)))
+    await application.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
