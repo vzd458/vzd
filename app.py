@@ -364,7 +364,7 @@ async def mp_webhook(request: Request):
 
 # ================= MAIN =================
 def main():
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     # handlers aqui...
 
