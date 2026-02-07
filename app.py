@@ -27,7 +27,19 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 GROUP_CHAT_ID = int(os.getenv("GROUP_CHAT_ID") or 0)
 
-START_VIDEO_URL = "https://files.catbox.moe/4abfa3.mp4"
+START_VIDEO_URL = "https://files.catbox.moe/fr10m2.mp4"
+
+START_VIDEO_URL_1 = "https://link-do-video-1.mp4"
+START_VIDEO_URL_2 = "https://link-do-video-2.mp4"
+START_AUDIO_URL = "https://link-do-audio.mp3"
+
+PRE_PAYMENT_VIDEO_URL = "https://link-do-video-antes-do-pix.mp4"
+ABANDON_VIDEO_URL = "https://link-do-video-lembrete.mp4"
+
+PREVIEW_VIDEO_1 = "https://link-do-video-previa-1.mp4"
+PREVIEW_VIDEO_2 = "https://link-do-video-previa-2.mp4"
+PREVIEW_VIDEO_3 = "https://link-do-video-previa-3.mp4"
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,39 +82,23 @@ MAIN_TEXT = """🔥Vazados BR ofc.🇧🇷
 🔐 Ao entrar, você libera: ⤵️
 
 🔞 𝙎𝙚𝙥𝙖𝙧𝙖𝙙𝙤𝙨 𝙥𝙤𝙧 𝙘𝙖𝙩𝙚𝙜𝙤𝙧𝙞𝙖:
-🗂 𝙊𝙧𝙜𝙖𝙣𝙞𝙯𝙖𝙘̧𝙖̃𝙤 𝙙𝙚 𝙖-𝙯!
-🔥amadores 
-🔥desenhos animados +18
-🔥lésbicas 
-🔥Hentai 
-🔥novinhas com animais
-🔥Anal
-🔥Anime
-🔥Trans
-🔥Cosplay
-🔥Milf
-🔥Boquete babado
-🔥Verdade ou desafio
-🔥 МILFѕСâmеrаѕ 
-🔥IΝс3ѕtо Ѕесrе3t0rеаl
-🔥 Novinhas
-🔥 Cornos 
-🔥 Virgens
-🔥 Lésbicas
-🔥Gordinhas
-🔥 Vazadas
-🔥 Flagras e Câmeras Escondidas
-🔥 Orgias & GangBang
-🔥 Coroas
-🔥 Famosas
-🔥tufos filmes animados
-🔥 CLOSE FRIENDS
-🔥 MAIS GOSTOSAS DA NET
-🔥 BRAZZERS
-🔥 XVÍDEOS RED
-🔥 FAMÍLIA SACANA
-🔥 é muito mais
-🔥 Chat ao vivo com novinhas
+🗂 𝙊𝙧𝙜𝙖𝙣𝙞𝙯𝙖𝙘‌𝙖‌𝙤 𝙙𝙚 𝙖-𝙯!
+🔥amadores🔥desenhos animados +18
+🔥lésbicas🔥Hentai 
+🔥novinhas com animais🔥Anal
+🔥Anime🔥Trans
+🔥Cosplay🔥Milf
+🔥Boquete babado🔥Verdade ou desafio
+🔥 МILFѕСâmеrаѕ 🔥IΝс3ѕtо Ѕесrе3t0rеаl
+🔥 Novinhas🔥 Cornos 
+🔥 Virgens🔥 Lésbicas
+🔥Gordinhas🔥 Vazadas
+🔥Câmeras Escondidas🔥 Orgias & GangBang
+🔥 Coroas🔥 Famosas
+🔥tufos filmes animados🔥 CLOSE FRIENDS
+🔥 MAIS GOSTOSAS DA NET🔥 BRAZZERS
+🔥 XVÍDEOS RED🔥 FAMÍLIA SACANA
+🔥 é muito mais🔥 Chat ao vivo com novinhas
 
 🚀 Liberado na hora
 🛠️ Suporte 24h
@@ -121,24 +117,81 @@ PLANS = {
     "vitalicio": {"label": "🔥 Vitalício — R$16", "amount": 16.00},
 }
 
-PROMO_CODES = {"THG100", "FLP100"}
+PROMO_CODES = {"THG100", "KLM100"}
 awaiting_promo = {}
 user_last_payment = {}
 bot_app = None
+
+abandoned_tasks = {}
+
+PREVIEW_BUTTON = InlineKeyboardButton("👀 Prévias", callback_data="preview")
+
+async def send_previews(update, context):
+    chat_id = update.callback_query.message.chat_id
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔥 Quero entrar", callback_data="restart")]
+    ])
+
+    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_1, reply_markup=keyboard)
+    await asyncio.sleep(1)
+
+    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_2, reply_markup=keyboard)
+    await asyncio.sleep(1)
+
+    await context.bot.send_video(chat_id=chat_id, video=PREVIEW_VIDEO_3, reply_markup=keyboard)
+
+
+async def abandoned_flow(context, user_id, chat_id):
+    await asyncio.sleep(180)  # 3 minutos
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔥 Quero entrar", callback_data="restart")]
+    ])
+
+    await context.bot.send_video(
+        chat_id=chat_id,
+        video=ABANDON_VIDEO_URL
+    )
+
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text=(
+            "⏰ *Ei! Ainda dá tempo de entrar.*\n\n"
+            "Clique no botão abaixo para continuar 👇"
+        ),
+        parse_mode="Markdown",
+        reply_markup=keyboard
+    )
 
 # ================= START =================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global counter_value
     counter_value = START_COUNTER
 
+    uid = update.effective_user.id
+
+    # cancela timer antigo
+    task = abandoned_tasks.pop(uid, None)
+    if task:
+        task.cancel()
+
+    # inicia novo timer de 3 minutos
+    task = asyncio.create_task(
+        abandoned_flow(context, uid, update.effective_chat.id)
+    )
+    abandoned_tasks[uid] = task
+
     keyboard = [
         [InlineKeyboardButton(PLANS["mensal"]["label"], callback_data="buy_mensal")],
         [InlineKeyboardButton(PLANS["vitalicio"]["label"], callback_data="buy_vitalicio")],
         [InlineKeyboardButton("🎟️ Código", callback_data="promo")],
-        [InlineKeyboardButton("🔄 Já paguei", callback_data="check_payment")]
+        [PREVIEW_BUTTON]
+        
     ]
-
-    await update.message.reply_video(video=START_VIDEO_URL)
+    await update.message.reply_video(video=START_VIDEO_URL_1)
+    await update.message.reply_video(video=START_VIDEO_URL_2)
+    await update.message.reply_audio(audio=START_AUDIO_URL)
 
     await update.message.reply_text(
         MAIN_TEXT,
@@ -174,7 +227,15 @@ async def counter_task(context, chat_id, message_id):
 async def process_payment(update, context, plan_key):
     plan = PLANS[plan_key]
     user_id = update.effective_user.id
+    msg = update.callback_query.message
 
+    # 📹 Envia vídeo antes do PIX
+    await msg.reply_video(video=PRE_PAYMENT_VIDEO_URL)
+
+    # ⏳ Pequeno delay (opcional, mas recomendado)
+    await asyncio.sleep(1)
+
+    # 💰 Agora gera o pagamento
     data = {
         "transaction_amount": plan["amount"],
         "description": f"{plan_key.upper()} user:{user_id}",
@@ -192,11 +253,14 @@ async def process_payment(update, context, plan_key):
     save_payment(payment_id, user_id, plan_key, plan["amount"])
     user_last_payment[user_id] = payment_id
 
-    msg = update.callback_query.message
+    keyboard = [
+        [InlineKeyboardButton("🔄 Já paguei", callback_data="check_payment")]
+    ]
 
     await msg.reply_text(
         f"💰 *{plan['label']}*\n\n🪙 *PIX Copia e Cola:*\n`{qr}`",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
     if qr_b64:
@@ -219,16 +283,20 @@ async def check_payment_status(update, context):
     status = info.get("response", {}).get("status")
 
     if status == "approved":
-        invite = await bot_app.bot.create_chat_invite_link(GROUP_CHAT_ID, member_limit=1)
-        await update.callback_query.message.reply_text(
-            f"✅ *Pagamento aprovado!*\n{invite.invite_link}",
-            parse_mode="Markdown"
-        )
-    else:
-        await update.callback_query.message.reply_text(
-            f"⏳ Status atual: *{status}*",
-            parse_mode="Markdown"
-        )
+
+    task = abandoned_tasks.pop(uid, None)
+    if task:
+        task.cancel()
+
+    invite = await bot_app.bot.create_chat_invite_link(
+        GROUP_CHAT_ID,
+        member_limit=1
+    )
+
+    await update.callback_query.message.reply_text(
+        f"✅ *Pagamento aprovado!*\n{invite.invite_link}",
+        parse_mode="Markdown"
+    )
 
 # ================= BUTTON =================
 async def button(update: Update, context):
@@ -245,8 +313,8 @@ async def button(update: Update, context):
         awaiting_promo[q.from_user.id] = True
         await q.message.reply_text("🎟️ Envie o código:")
 
-    elif q.data == "check_payment":
-        await check_payment_status(update, context)
+    elif q.data == "preview":
+    await send_previews(update, context)
 
 # ================= PROMO =================
 async def handle_message(update: Update, context):
